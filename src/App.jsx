@@ -1,122 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { Box } from '@mui/material';
+import BookListPage from './pages/BookListPage';
+import BookDetailPage from './pages/BookDetailPage';
+import BookFormPage from './pages/BookFormPage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [page, setPage] = useState('list'); // 'list' | 'detail' | 'form'
+  const [selectedId, setSelectedId] = useState(null); // 어떤 책을 볼지/수정할지 ID 저장
+
+  const goList = () => {
+    setPage('list');
+    setSelectedId(null);
+  };
+
+  const goDetail = (id) => {
+    setSelectedId(id);
+    setPage('detail');
+  };
+
+  const goForm = (id = null) => {
+    setSelectedId(id); // id가 있으면 수정(id 전달), 없으면 등록(null)
+    setPage('form');
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <Box sx={{ textAlign: 'left', width: '100%' }}>
+      {page === 'list' && (
+        <BookListPage onAddClick={() => goForm()} onBookClick={(id) => goDetail(id)} />
+      )}
+      
+      {page === 'detail' && (
+        <BookDetailPage
+          bookId={selectedId} // 전달받은 ID를 상세 페이지로 넘김
+          onAddClick={() => goForm()}
+          onBackClick={goList}
+          onEditClick={() => goForm(selectedId)} // 수정 시 기존 ID 전달
+          onDeleteClick={goList}
+        />
+      )}
+      
+      {page === 'form' && (
+        <BookFormPage
+          bookId={selectedId} // 수정일 경우 ID가 넘어가고, 등록일 경우 null
+          onAddClick={() => goForm()}
+          onBackClick={goList}
+          onCancel={selectedId ? () => goDetail(selectedId) : goList}
+          onSubmit={goList}
+        />
+      )}
+    </Box>
+  );
 }
 
-export default App
+export default App;
