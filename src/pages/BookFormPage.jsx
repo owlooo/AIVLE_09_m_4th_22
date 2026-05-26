@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Container, Box, Typography, TextField, Select, MenuItem, FormControl, 
-  InputLabel, Button, Stack, Grid, Link,
+  InputLabel, Button, Stack, Grid, Link, FormHelperText
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Header from '../components/Header';
@@ -15,23 +15,23 @@ function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
     publisher: '',
     publishDate: '',
     genres: [],
-    description: '', // 'description'으로 통일
+    description: '',
   });
 
-  // 수정 모드일 때 데이터 로드
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     if (bookId) {
       const fetchData = async () => {
         try {
           const data = await getBookById(bookId);
-          // API에서 받아온 데이터가 있으면 state에 저장
           setFormData({
             title: data.title || '',
             author: data.author || '',
             publisher: data.publisher || '',
             publishDate: data.publishDate || '',
             genres: data.genres || [],
-            description: data.description || '', // 데이터 매핑 확인
+            description: data.description || data.content || '',
           });
         } catch (error) {
           console.error("데이터 로드 실패:", error);
@@ -47,16 +47,50 @@ function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
       ...prev, 
       [name]: value 
     }));
+    
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = '제목은 필수 입력입니다.';
+    }
+
+    if (!formData.author.trim()) {
+      newErrors.author = '저자는 필수 입력입니다.';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = '책 소개는 필수 입력입니다.';
+    } else if (formData.description.length < 10) {
+      newErrors.description = '책 소개는 최소 10자 이상 작성해주세요.';
+    }
+
+    setErrors(newErrors);
+    
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
-    const dataToSave = {...formData, content: formData.description};
+    if (!validate()) {
+      return; 
+    }
+
+    const dataToSave = {
+      ...formData,
+      content: formData.description, 
+    };
+
     try {
       if (bookId) {
-        await updateBook(bookId, formData);
+        await updateBook(bookId, dataToSave);
         alert('수정되었습니다.');
       } else {
-        await createBook(formData);
+        await createBook(dataToSave);
         alert('등록되었습니다.');
       }
       onSubmit();
@@ -76,8 +110,7 @@ function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
           onClick={onBackClick}
           sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, mb: 1, color: 'primary.main', fontSize: '0.9rem' }}
         >
-          <ArrowBackIcon fontSize="small" />
-          목록으로
+          <ArrowBackIcon fontSize="small" /> 목록으로
         </Link>
 
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
@@ -87,12 +120,32 @@ function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, md: 7 }}>
             <Stack spacing={2.5}>
-              <TextField label="제목" name="title" value={formData.title} onChange={handleChange} fullWidth size="small" />
-              <TextField label="저자" name="author" value={formData.author} onChange={handleChange} fullWidth size="small" />
+              <TextField 
+                label="제목 *" 
+                name="title" 
+                value={formData.title} 
+                onChange={handleChange} 
+                fullWidth 
+                size="small" 
+                error={!!errors.title}
+                helperText={errors.title}
+              />
+              <TextField 
+                label="저자 *" 
+                name="author" 
+                value={formData.author} 
+                onChange={handleChange} 
+                fullWidth 
+                size="small" 
+                error={!!errors.author}
+                helperText={errors.author}
+              />
+              
               <Stack direction="row" spacing={2}>
                 <TextField label="출판사" name="publisher" value={formData.publisher} onChange={handleChange} fullWidth size="small" />
                 <TextField name="publishDate" type="date" value={formData.publishDate} onChange={handleChange} fullWidth size="small" InputLabelProps={{ shrink: true }} />
               </Stack>
+              
               <FormControl size="small" fullWidth>
                 <InputLabel>장르</InputLabel>
                 <Select label="장르" name="genres" value={formData.genres || []} onChange={handleChange} multiple>
@@ -102,15 +155,18 @@ function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
                   <MenuItem value="베스트셀러">베스트셀러</MenuItem>
                 </Select>
               </FormControl>
+              
               <TextField
-                label="책 소개"
-                name="description" // 확실하게 name="description"으로 고정
+                label="책 소개 *"
+                name="description"
                 value={formData.description}
                 onChange={handleChange}
                 multiline
                 minRows={6}
                 fullWidth
                 size="small"
+                error={!!errors.description}
+                helperText={errors.description || '최소 10자 이상 입력해주세요.'}
               />
             </Stack>
           </Grid>
