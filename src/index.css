@@ -1,3 +1,4 @@
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -110,3 +111,193 @@ code {
   background: var(--code-bg);
 }
 
+
+
+.MuiOutlinedInput-root {
+  border-radius: 12px !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border: 2px solid #7dd3fc !important;
+}
+
+.MuiDivider-root {
+  margin-bottom: 20px !important;
+}
+
+.MuiTypography-body1 {
+  border: 2px solid #7dd3fc;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+body {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 45%);
+}
+
+
+
+div[class*="MuiCardContent"] {
+  background: #f0f9ff;
+  border-top: 1px solid #dbeafe;
+}
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #eef5ff, #f8fbff);
+}
+
+.MuiGrid-root {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 10px 30px rgba(31, 38, 135, 0.12),
+    0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.MuiTypography-h4 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #1f2b4d;
+  margin-bottom: 10px !important;
+}
+
+.MuiTypography-body1 {
+  color: #6b7280;
+  line-height: 1.8;
+}
+
+.MuiTypography-h6 {
+  color: #3b4b7a;
+  font-weight: 700 !important;
+}
+
+.MuiButton-root {
+  border-radius: 14px !important;
+  padding: 8px 18px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.MuiButton-root:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.MuiDivider-root {
+  margin: 28px 0 !important;
+}
+
+.MuiGrid-root.MuiGrid-grid-xs-12 {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+textarea {
+  min-height: 75px !important;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left,
+      rgba(180,210,255,0.35) 0%,
+      transparent 30%),
+
+    radial-gradient(circle at bottom right,
+      rgba(120,170,255,0.28) 0%,
+      transparent 35%),
+
+    #f7f9fc;
+
+  background-attachment: fixed;
+}
+
+.MuiPaper-root,
+.css-8x01hq,
+.css-68htm6-MuiGrid-root{
+  border-radius: 24px;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.04),
+    0 10px 30px rgba(25,118,210,0.06);
+
+  transition: all 0.3s ease;
+}
+
+.MuiPaper-root{
+  border-radius: 28px !important;
+  overflow: hidden;
+}
+
+.css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root,
+.css-sc8y68-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root{
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.95),
+    rgba(230,244,255,0.9)
+  );
+
+  border-radius: 16px;
+}
+
+.css-x2rf02-MuiGrid-root{
+  border: 2px solid rgba(135,206,250,0.45);
+
+  border-radius: 36px;
+
+  box-shadow:
+    0 0 12px rgba(135,206,250,0.12);
+}
+
+.css-kqg16c-MuiGrid-root{
+  border: 2px solid rgba(135,206,250,0.45);
+
+  border-radius: 36px;
+
+  padding: 32px;
+
+  box-shadow:
+    0 0 12px rgba(135,206,250,0.12);
+
+  background: rgba(255,255,255,0.96);
+}
+
+
+.MuiOutlinedInput-root{
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.96),
+    rgba(220,240,255,0.92)
+  ) !important;
+
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 4px 12px rgba(135,206,250,0.12);
+
+  transition: all 0.25s ease;
+}
+
+.css-rizt0-MuiTypography-root,
+.css-1ersi4j-MuiTypography-root{
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.98),
+    rgba(220,240,255,0.88)
+  );
+
+  border: 2px solid rgba(135,206,250,0.45);
+
+  border-radius: 24px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 4px 14px rgba(135,206,250,0.12);
+}
