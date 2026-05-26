@@ -1,189 +1,118 @@
+import { useState, useEffect } from 'react';
 import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  Stack,
-  Grid,
-  Link,
+  Container, Box, Typography, TextField, Select, MenuItem, FormControl, 
+  InputLabel, Button, Stack, Grid, Link,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Header from '../components/Header';
 import AiCoverPanel from '../components/AiCoverPanel';
+import { getBookById, createBook, updateBook } from '../bookService';
 
-const inputStyle = {
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
-    bgcolor: '#fff',
-  },
-};
-function BookFormPage({ onAddClick, onBackClick, onCancel, onSubmit }) {
+function BookFormPage({ bookId, onAddClick, onBackClick, onCancel, onSubmit }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    author: '',
+    publisher: '',
+    publishDate: '',
+    genres: [],
+    description: '', // 'description'으로 통일
+  });
+
+  // 수정 모드일 때 데이터 로드
+  useEffect(() => {
+    if (bookId) {
+      const fetchData = async () => {
+        try {
+          const data = await getBookById(bookId);
+          // API에서 받아온 데이터가 있으면 state에 저장
+          setFormData({
+            title: data.title || '',
+            author: data.author || '',
+            publisher: data.publisher || '',
+            publishDate: data.publishDate || '',
+            genres: data.genres || [],
+            description: data.description || '', // 데이터 매핑 확인
+          });
+        } catch (error) {
+          console.error("데이터 로드 실패:", error);
+        }
+      };
+      fetchData();
+    }
+  }, [bookId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: value 
+    }));
+  };
+
+  const handleSave = async () => {
+    const dataToSave = {...formData, content: formData.description};
+    try {
+      if (bookId) {
+        await updateBook(bookId, formData);
+        alert('수정되었습니다.');
+      } else {
+        await createBook(formData);
+        alert('등록되었습니다.');
+      }
+      onSubmit();
+    } catch (error) {
+      alert('저장에 실패했습니다.');
+    }
+  };
+
   return (
-  <Box sx={{ bgcolor: '#f5f7fb', minHeight: '100vh' }}>
-    <Header onAddClick={onAddClick} />
+    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
+      <Header onAddClick={onAddClick} />
 
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box
-        sx={{
-          bgcolor: 'white',
-          borderRadius: 4,
-          p: { xs: 3, md: 4 },
-          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
-        }}
-      >
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <Link
           component="button"
           underline="hover"
           onClick={onBackClick}
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.5,
-            mb: 2,
-            color: 'primary.main',
-            fontWeight: 600,
-            fontSize: '1rem',
-          }}
+          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, mb: 1, color: 'primary.main', fontSize: '0.9rem' }}
         >
           <ArrowBackIcon fontSize="small" />
           목록으로
         </Link>
 
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: 800,
-            mb: 1,
-            color: '#172033',
-          }}
-        >
-          새 도서 등록
-        </Typography>
-
-        <Typography sx={{ color: '#667085', mb: 4 }}>
-          도서 정보를 입력하고 표지 이미지를 등록하세요.
+        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
+          {bookId ? '도서 수정' : '새 도서 등록'}
         </Typography>
 
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, md: 7 }}>
-            <Box
-              sx={{
-                border: '1px solid',
-                borderColor: '#e5e7eb',
-                borderRadius: 3,
-                p: 3,
-              }}
-            >
-              <Stack spacing={2.5}>
-                <TextField
-                  label="제목"
-                  placeholder="도서 제목을 입력하세요"
-                  required
-                  fullWidth
-                  size="small"
-                  sx={inputStyle}
-                />
-                <TextField
-                  label="저자"
-                  placeholder="저자명을 입력하세요"
-                  required
-                  fullWidth
-                  size="small"
-                  sx={inputStyle}
-                />
-                <TextField
-                  label="출판사"
-                  placeholder="출판사를 입력하세요"
-                  fullWidth
-                  size="small"
-                  sx={inputStyle}
-                />
-
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Typography
-                      variant="caption"
-                      component="label"
-                      htmlFor="publishDate"
-                      sx={{
-                        display: 'block',
-                        mb: 0.8,
-                        fontWeight: 700,
-                        color: '#172033',
-                      }}
-                    >
-                      출판일
-                    </Typography>
-                    <TextField
-                      id="publishDate"
-                      type="date"
-                      fullWidth
-                      size="small"
-                      sx={inputStyle}
-                    />
-                  </Grid>
-
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <FormControl size="small" fullWidth sx={inputStyle}>
-                      <InputLabel>장르</InputLabel>
-                      <Select label="장르" defaultValue="">
-                        <MenuItem value="">장르를 선택하세요</MenuItem>
-                        <MenuItem value="소설">소설</MenuItem>
-                        <MenuItem value="에세이">에세이</MenuItem>
-                        <MenuItem value="자기계발">자기계발</MenuItem>
-                        <MenuItem value="베스트셀러">베스트셀러</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-
-                <TextField
-                  label="책 소개"
-                  placeholder="책 소개 내용을 입력하세요"
-                  multiline
-                  minRows={6}
-                  fullWidth
-                  size="small"
-                  sx={inputStyle}
-                />
-                <Box
-  sx={{
-    mt: 3,
-    p: 2,
-    borderRadius: 3,
-    bgcolor: '#f8fafc',
-    border: '1px solid #e5e7eb',
-  }}
->
-  <Typography
-    sx={{
-      fontWeight: 700,
-      color: '#0f9f8f',
-      mb: 1,
-    }}
-  >
-    📚 도서 등록 팁
-  </Typography>
-
-  <Typography sx={{ color: '#475569', fontSize: '0.95rem', mb: 0.5 }}>
-    • 키워드를 자세히 입력할수록 좋은 표지가 생성됩니다.
-  </Typography>
-
-  <Typography sx={{ color: '#475569', fontSize: '0.95rem', mb: 0.5 }}>
-    • 책 소개는 2~3줄 정도 작성하는 것을 추천합니다.
-  </Typography>
-
-  <Typography sx={{ color: '#475569', fontSize: '0.95rem' }}>
-    • 장르 선택 시 AI 추천 스타일이 달라집니다.
-  </Typography>
-</Box>
+            <Stack spacing={2.5}>
+              <TextField label="제목" name="title" value={formData.title} onChange={handleChange} fullWidth size="small" />
+              <TextField label="저자" name="author" value={formData.author} onChange={handleChange} fullWidth size="small" />
+              <Stack direction="row" spacing={2}>
+                <TextField label="출판사" name="publisher" value={formData.publisher} onChange={handleChange} fullWidth size="small" />
+                <TextField name="publishDate" type="date" value={formData.publishDate} onChange={handleChange} fullWidth size="small" InputLabelProps={{ shrink: true }} />
               </Stack>
-            </Box>
+              <FormControl size="small" fullWidth>
+                <InputLabel>장르</InputLabel>
+                <Select label="장르" name="genres" value={formData.genres || []} onChange={handleChange} multiple>
+                  <MenuItem value="소설">소설</MenuItem>
+                  <MenuItem value="에세이">에세이</MenuItem>
+                  <MenuItem value="자기계발">자기계발</MenuItem>
+                  <MenuItem value="베스트셀러">베스트셀러</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="책 소개"
+                name="description" // 확실하게 name="description"으로 고정
+                value={formData.description}
+                onChange={handleChange}
+                multiline
+                minRows={6}
+                fullWidth
+                size="small"
+              />
+            </Stack>
           </Grid>
 
           <Grid size={{ xs: 12, md: 5 }}>
@@ -191,39 +120,13 @@ function BookFormPage({ onAddClick, onBackClick, onCancel, onSubmit }) {
           </Grid>
         </Grid>
 
-        <Stack
-          direction="row"
-          spacing={1.5}
-          sx={{ justifyContent: 'flex-end', mt: 4 }}
-        >
-          <Button
-            variant="outlined"
-            onClick={onCancel}
-            sx={{
-              borderRadius: 2,
-              px: 3,
-              fontWeight: 700,
-            }}
-          >
-            취소
-          </Button>
-          <Button
-            variant="contained"
-            onClick={onSubmit}
-            sx={{
-              borderRadius: 2,
-              px: 3,
-              fontWeight: 700,
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-            }}
-          >
-            저장하기
-          </Button>
+        <Stack direction="row" spacing={1.5} sx={{ justifyContent: 'flex-end', mt: 4 }}>
+          <Button variant="outlined" onClick={onCancel}>취소</Button>
+          <Button variant="contained" onClick={handleSave}>저장하기</Button>
         </Stack>
-      </Box>
-    </Container>
-  </Box>
-);
+      </Container>
+    </Box>
+  );
 }
 
 export default BookFormPage;
