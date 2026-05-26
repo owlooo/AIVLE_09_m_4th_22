@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Container,
   Box,
@@ -8,12 +9,14 @@ import {
   Divider,
   Link,
   Grid,
+  Dialog,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import Header from '../components/Header';
+import AiCoverPanel from '../components/AiCoverPanel';
 
 // Mock 데이터 (UI 미리보기용)
 const MOCK_BOOK = {
@@ -30,6 +33,7 @@ const MOCK_BOOK = {
 
 function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick }) {
   const book = MOCK_BOOK;
+  const [showAiPanel, setShowAiPanel] = useState(false);
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
@@ -57,36 +61,38 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
         <Grid container spacing={4}>
           {/* 왼쪽: 표지 이미지 */}
           <Grid size={{ xs: 12, sm: 5, md: 4 }}>
-            <Box
-              sx={{
-                width: '100%',
-                maxWidth: 360,
-                aspectRatio: '3 / 4',
-                bgcolor: 'grey.100',
-                border: '1px dashed',
-                borderColor: 'grey.300',
-                borderRadius: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'grey.500',
-              }}
-            >
-              {book.coverImageUrl ? (
-                <Box
-                  component="img"
-                  src={book.coverImageUrl}
-                  alt={book.title}
-                  sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <Stack spacing={1} sx={{ alignItems: 'center' }}>
-                  <ImageIcon fontSize="large" />
-                  <Typography variant="body2">표지 이미지</Typography>
-                </Stack>
-              )}
-            </Box>
+            <Stack spacing={2} sx={{ maxWidth: 360 }}>
+              <Box
+                sx={{
+                  width: '100%',
+                  aspectRatio: '3 / 4',
+                  bgcolor: 'grey.100',
+                  border: '1px dashed',
+                  borderColor: 'grey.300',
+                  borderRadius: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'grey.500',
+                }}
+              >
+                {book.coverImageUrl ? (
+                  <Box
+                    component="img"
+                    src={book.coverImageUrl}
+                    alt={book.title}
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <Stack spacing={1} sx={{ alignItems: 'center' }}>
+                    <ImageIcon fontSize="large" />
+                    <Typography variant="body2">표지 이미지</Typography>
+                  </Stack>
+                )}
+              </Box>
+
+            </Stack>
           </Grid>
 
           {/* 오른쪽: 상세 정보 */}
@@ -123,7 +129,12 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
               ))}
             </Stack>
 
-            <Stack direction="row" spacing={1} sx={{ mt: 3 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              useFlexGap
+              sx={{ mt: 3, flexWrap: 'wrap' }}
+            >
               <Button
                 variant="outlined"
                 startIcon={<EditIcon />}
@@ -138,6 +149,12 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
                 onClick={onDeleteClick}
               >
                 삭제
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => setShowAiPanel((v) => !v)}
+              >
+                AI 표지 수정
               </Button>
             </Stack>
 
@@ -156,6 +173,17 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
           </Grid>
         </Grid>
       </Container>
+
+      {/* AI 표지 생성 — 화면 가운데 팝업(Dialog) */}
+      <Dialog
+        open={showAiPanel}
+        onClose={() => setShowAiPanel(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { p: 2, bgcolor: 'background.paper' } }}
+      >
+        <AiCoverPanel onClose={() => setShowAiPanel(false)} />
+      </Dialog>
     </Box>
   );
 }
