@@ -9,16 +9,19 @@ import {
   Divider,
   Link,
   Grid,
+  Dialog,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import Header from '../components/Header';
+import AiCoverPanel from '../components/AiCoverPanel';
 import { getBookById, deleteBook } from '../bookService';
 
 function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick }) {
   const [book, setBook] = useState(null);
+  const [showAiPanel, setShowAiPanel] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,9 +92,15 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
               </Stack>
             )}
 
-            <Stack direction="row" spacing={1} sx={{ mt: 3 }}>
+            <Stack
+              direction="row"
+              spacing={1}
+              useFlexGap
+              sx={{ mt: 3, flexWrap: 'wrap' }}
+            >
               <Button variant="outlined" startIcon={<EditIcon />} onClick={onEditClick}>수정</Button>
               <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>삭제</Button>
+              <Button variant="contained" onClick={() => setShowAiPanel((v) => !v)}>AI 표지 수정</Button>
             </Stack>
 
             <Divider sx={{ my: 3 }} />
@@ -104,6 +113,17 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
           </Grid>
         </Grid>
       </Container>
+
+      {/* AI 표지 생성 — 화면 가운데 팝업(Dialog) */}
+      <Dialog
+        open={showAiPanel}
+        onClose={() => setShowAiPanel(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { p: 2, bgcolor: 'background.paper' } }}
+      >
+        <AiCoverPanel onClose={() => setShowAiPanel(false)} />
+      </Dialog>
     </Box>
   );
 }
