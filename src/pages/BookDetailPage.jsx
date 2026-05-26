@@ -122,7 +122,14 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
         fullWidth
         PaperProps={{ sx: { p: 2, bgcolor: 'background.paper' } }}
       >
-        <AiCoverPanel onClose={() => setShowAiPanel(false)} />
+        <AiCoverPanel
+          book={book}
+          onClose={() => setShowAiPanel(false)}
+          onCoverGenerated={(coverImageUrl) => {
+            setBook((prev) => ({ ...prev, coverImageUrl }));
+            setShowAiPanel(false);
+          }}
+        />
       </Dialog>
     </Box>
   );

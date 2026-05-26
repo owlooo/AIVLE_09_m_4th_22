@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Paper,
   Typography,
@@ -10,15 +10,21 @@ import {
   InputLabel,
   Stack,
   IconButton,
-  Switch,
   Box,
   Divider,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import CloseIcon from '@mui/icons-material/Close';
+import { updateBookCover } from '../bookService';
+import {
+  buildCoverPrompt,
+  generateCoverImage,
+} from '../coverService';
 
-function AiCoverPanel({ onGenerate, onClose }) {
-  // 컨트롤드 상태들
+function AiCoverPanel({ book, onCoverGenerated, onClose }) {
+  const [apiKey, setApiKey] = useState('');
   const [extraKeyword, setExtraKeyword] = useState('');
   const [style, setStyle] = useState('수채화');
   const [customStyle, setCustomStyle] = useState('');
@@ -30,11 +36,49 @@ function AiCoverPanel({ onGenerate, onClose }) {
   const [customRatio, setCustomRatio] = useState('');
   const [ratioOpen, setRatioOpen] = useState(false);
   const [quality, setQuality] = useState('medium');
-  const [includeTitle, setIncludeTitle] = useState(false);
+  const [error, setError] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const selectedStyle = customStyle.trim() || style;
+  const selectedColorTone = customColorTone.trim() || colorTone;
+  const selectedRatio = customRatio.trim() || ratio;
+
+  const prompt = useMemo(
+    () =>
+      buildCoverPrompt(book, {
+        keywords: extraKeyword,
+        style: selectedStyle,
+        colorTone: selectedColorTone,
+      }),
+    [book, extraKeyword, selectedStyle, selectedColorTone]
+  );
+
+  const handleGenerate = async () => {
+    if (!book?.id) {
+      setError('저장된 도서 상세 페이지에서 표지를 생성할 수 있습니다.');
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      setError('');
+      const imageSrc = await generateCoverImage({
+        apiKey,
+        prompt,
+        size: selectedRatio,
+        quality,
+      });
+      const updatedBook = await updateBookCover(book.id, imageSrc);
+      onCoverGenerated?.(updatedBook.coverImageUrl || imageSrc);
+    } catch (err) {
+      setError(err.message || '표지 생성에 실패했습니다.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <Stack spacing={2}>
-      {/* AI 표지 자동 생성 영역 */}
       <Paper
         variant="outlined"
         sx={{
@@ -43,7 +87,6 @@ function AiCoverPanel({ onGenerate, onClose }) {
           backgroundColor: 'rgba(25, 118, 210, 0.04)',
         }}
       >
-        {/* 헤더 */}
         <Stack
           direction="row"
           spacing={1}
@@ -75,21 +118,19 @@ function AiCoverPanel({ onGenerate, onClose }) {
           color="text.secondary"
           sx={{ display: 'block' }}
         >
-          아래에 추가 기능을 입력하세요.
+          아래 옵션으로 분위기와 이미지 품질을 조정할 수 있습니다.
         </Typography>
 
         <Stack spacing={1.5} sx={{ mt: 2 }}>
-          {/* 추가 키워드 input */}
           <TextField
             label="추가 키워드 (선택)"
             placeholder="예: 푸른 색감, 가을 분위기"
             size="small"
-            fullWidth
             value={extraKeyword}
             onChange={(e) => setExtraKeyword(e.target.value)}
+            fullWidth
           />
 
-          {/* 스타일 + 색감 (2-column) */}
           <Stack direction="row" spacing={1}>
             <FormControl size="small" fullWidth>
               <InputLabel>스타일</InputLabel>
@@ -221,7 +262,6 @@ function AiCoverPanel({ onGenerate, onClose }) {
             </FormControl>
           </Stack>
 
-          {/* 이미지 비율 + 품질 (2-column) */}
           <Stack direction="row" spacing={1}>
             <FormControl size="small" fullWidth>
               <InputLabel>이미지 비율</InputLabel>
@@ -233,7 +273,7 @@ function AiCoverPanel({ onGenerate, onClose }) {
                 onClose={() => setRatioOpen(false)}
                 onChange={(e) => {
                   setRatio(e.target.value);
-                  setCustomRatio(''); // 프리셋 선택 시 직접 입력값 초기화
+                  setCustomRatio('');
                 }}
                 MenuProps={{
                   autoFocus: false,
@@ -254,13 +294,8 @@ function AiCoverPanel({ onGenerate, onClose }) {
                 <Box
                   sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}
                   onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    // Select가 Enter/Space 등을 가로채지 못하게 차단
-                    e.stopPropagation();
-                  }}
-                  onKeyDownCapture={(e) => {
-                    e.stopPropagation();
-                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  onKeyDownCapture={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                 >
                   <TextField
@@ -273,7 +308,6 @@ function AiCoverPanel({ onGenerate, onClose }) {
                       if (e.key === 'Enter') {
                         e.preventDefault();
                         e.stopPropagation();
-                        // 다음 tick에서 닫기 -> MUI 내부 처리와 충돌 방지
                         setTimeout(() => setRatioOpen(false), 0);
                       }
                     }}
@@ -309,38 +343,40 @@ function AiCoverPanel({ onGenerate, onClose }) {
             </FormControl>
           </Stack>
 
-          {/* 표지에 제목 텍스트 포함 토글 */}
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Switch
-              size="small"
-              checked={includeTitle}
-              onChange={(e) => setIncludeTitle(e.target.checked)}
-            />
-            <Typography variant="body2">
-              표지에 제목 텍스트 포함
-              <Typography
-                component="span"
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 0.5 }}
-              >
-                (한글은 깨질 수 있음)
-              </Typography>
-            </Typography>
-          </Stack>
+          <TextField
+            label="프롬프트 미리보기"
+            value={prompt}
+            multiline
+            minRows={5}
+            size="small"
+            fullWidth
+            InputProps={{ readOnly: true }}
+          />
 
-          {/* 생성하기 버튼 */}
+          {error && <Alert severity="error">{error}</Alert>}
+
           <Button
             variant="contained"
             fullWidth
-            onClick={onGenerate}
+            disabled={isGenerating}
+            onClick={handleGenerate}
           >
-            AI 표지 생성하기
+            {isGenerating ? (
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                <CircularProgress color="inherit" size={18} />
+                <span>표지 생성 중...</span>
+              </Stack>
+            ) : (
+              '이 도서 내용으로 표지 생성'
+            )}
           </Button>
+
+          <Typography variant="caption" color="text.secondary">
+            ※ 이미지 생성 시 OpenAI API 사용량에 따라 비용이 발생할 수 있습니다.
+          </Typography>
         </Stack>
       </Paper>
 
-      {/* API Key 입력 영역 */}
       <Paper
         variant="outlined"
         sx={{
@@ -363,6 +399,8 @@ function AiCoverPanel({ onGenerate, onClose }) {
           type="password"
           placeholder="sk-..."
           size="small"
+          value={apiKey}
+          onChange={(event) => setApiKey(event.target.value)}
           fullWidth
         />
       </Paper>
