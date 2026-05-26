@@ -28,7 +28,7 @@ function App() {
       {page === 'list' && (
         <BookListPage onAddClick={() => goForm()} onBookClick={(id) => goDetail(id)} />
       )}
-      
+
       {page === 'detail' && (
         <BookDetailPage
           bookId={selectedId} // 전달받은 ID를 상세 페이지로 넘김
@@ -38,7 +38,7 @@ function App() {
           onDeleteClick={goList}
         />
       )}
-      
+
       {page === 'form' && (
         <BookFormPage
           bookId={selectedId} // 수정일 경우 ID가 넘어가고, 등록일 경우 null
@@ -46,6 +46,8 @@ function App() {
           onBackClick={goList}
           onCancel={selectedId ? () => goDetail(selectedId) : goList}
           onSubmit={goList}
+          onSubmitWithAi={(id) => goDetail(id ?? selectedId)}
+          isEditing={!!selectedId}
         />
       )}
     </Box>

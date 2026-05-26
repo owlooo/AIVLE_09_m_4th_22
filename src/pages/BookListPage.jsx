@@ -10,7 +10,9 @@ import {
   Typography,
   Grid,
   Stack,
-  CircularProgress, // 로딩 스피너 추가
+  Divider,
+  Button,
+  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from '../components/Header';
@@ -21,7 +23,9 @@ function BookListPage({ onAddClick, onBookClick }) {
   const [books, setBooks] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
-  
+  const [customGenreFilter, setCustomGenreFilter] = useState('');
+  const [genreFilterOpen, setGenreFilterOpen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -42,13 +46,18 @@ function BookListPage({ onAddClick, onBookClick }) {
     fetchBooks();
   }, []);
 
+  // 직접 입력값이 있으면 그걸 우선 사용
+  const activeGenreFilter = customGenreFilter || selectedGenre;
+
   const filteredBooks = books.filter((book) => {
-    const matchesSearch = 
+    const matchesSearch =
       book.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
       (book.author && book.author.toLowerCase().includes(searchKeyword.toLowerCase()));
-    
-    const matchesGenre = selectedGenre === '' || (book.genres && book.genres.includes(selectedGenre));
-    
+
+    const matchesGenre =
+      activeGenreFilter === '' ||
+      (book.genres && book.genres.includes(activeGenreFilter));
+
     return matchesSearch && matchesGenre;
   });
 
@@ -104,16 +113,68 @@ function BookListPage({ onAddClick, onBookClick }) {
           />
 
           <FormControl size="small" sx={{ minWidth: 140 }}>
-            <Select 
-              value={selectedGenre} 
-              onChange={(e) => setSelectedGenre(e.target.value)}
+            <Select
+              value={selectedGenre}
+              open={genreFilterOpen}
+              onOpen={() => setGenreFilterOpen(true)}
+              onClose={() => setGenreFilterOpen(false)}
+              onChange={(e) => {
+                setSelectedGenre(e.target.value);
+                setCustomGenreFilter('');
+              }}
+              MenuProps={{ autoFocus: false, disableAutoFocusItem: true }}
+              renderValue={(val) => {
+                if (customGenreFilter) return `직접 입력: ${customGenreFilter}`;
+                if (!val) return '전체 장르';
+                return val;
+              }}
               displayEmpty
             >
               <MenuItem value="">전체 장르</MenuItem>
               <MenuItem value="소설">소설</MenuItem>
               <MenuItem value="에세이">에세이</MenuItem>
               <MenuItem value="자기계발">자기계발</MenuItem>
-              <MenuItem value="베스트셀러">베스트셀러</MenuItem>
+              <MenuItem value="인문">인문</MenuItem>
+              <MenuItem value="경제경영">경제경영</MenuItem>
+              <Divider />
+              <Box
+                sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                onKeyDownCapture={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="예: 과학"
+                  value={customGenreFilter}
+                  onChange={(e) => setCustomGenreFilter(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setTimeout(() => {
+                        setSelectedGenre('');
+                        setGenreFilterOpen(false);
+                      }, 0);
+                    }
+                  }}
+                  autoComplete="off"
+                />
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedGenre('');
+                    setGenreFilterOpen(false);
+                  }}
+                  sx={{ flexShrink: 0 }}
+                >
+                  적용
+                </Button>
+              </Box>
             </Select>
           </FormControl>
 
