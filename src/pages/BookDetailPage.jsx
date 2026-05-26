@@ -214,6 +214,7 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
             >
               {book.description}
             </Typography>
+            
           </Grid>
         </Grid>
       </Box>

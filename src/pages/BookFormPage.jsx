@@ -151,6 +151,37 @@ function BookFormPage({ onAddClick, onBackClick, onCancel, onSubmit }) {
                   size="small"
                   sx={inputStyle}
                 />
+                <Box
+  sx={{
+    mt: 3,
+    p: 2,
+    borderRadius: 3,
+    bgcolor: '#f8fafc',
+    border: '1px solid #e5e7eb',
+  }}
+>
+  <Typography
+    sx={{
+      fontWeight: 700,
+      color: '#0f9f8f',
+      mb: 1,
+    }}
+  >
+    📚 도서 등록 팁
+  </Typography>
+
+  <Typography sx={{ color: '#475569', fontSize: '0.95rem', mb: 0.5 }}>
+    • 키워드를 자세히 입력할수록 좋은 표지가 생성됩니다.
+  </Typography>
+
+  <Typography sx={{ color: '#475569', fontSize: '0.95rem', mb: 0.5 }}>
+    • 책 소개는 2~3줄 정도 작성하는 것을 추천합니다.
+  </Typography>
+
+  <Typography sx={{ color: '#475569', fontSize: '0.95rem' }}>
+    • 장르 선택 시 AI 추천 스타일이 달라집니다.
+  </Typography>
+</Box>
               </Stack>
             </Box>
           </Grid>
