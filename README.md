@@ -1,16 +1,49 @@
-# React + Vite
+# AIVLE 4차 미니프로젝트 22조
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 처음 실행
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+터미널에 나온 주소로 접속하면 됩니다.
 
-## React Compiler
+## 브랜치
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+각자 맡은 브랜치에서 작업합니다.
 
-## Expanding the ESLint configuration
+```text
+UI·레이아웃: feature/ui
+CRUD 연동: feature/crud
+OpenAI 연동: feature/llm
+스타일링·QA: feature/style-qa
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+예시:
+
+```bash
+git checkout feature/ui
+```
+
+## 작업 순서
+
+작업 전:
+
+```bash
+git pull
+```
+
+작업 후:
+
+```bash
+npm run build
+git add .
+git commit -m "작업 내용"
+git push
+```
+
+## API 키
+
+API 키는 GitHub에 올리지 않습니다.
+실제 키는 `.env` 파일에 넣고, 예시는 `.env.example`을 참고합니다.

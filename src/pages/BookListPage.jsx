@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Box,
@@ -12,44 +12,96 @@ import {
   Stack,
   Divider,
   Button,
+  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Header from '../components/Header';
 import BookCard from '../components/BookCard';
-
-// Mock 데이터 (UI 미리보기용) — 추후 API 연동 시 교체
-const MOCK_BOOKS = [
-  { id: 1, title: '도서 제목 1', author: '저자명', genres: ['소설', '베스트셀러'] },
-  { id: 2, title: '도서 제목 2', author: '저자명', genres: ['소설', '베스트셀러'] },
-  { id: 3, title: '도서 제목 3', author: '저자명', genres: ['소설', '베스트셀러'] },
-  { id: 4, title: '도서 제목 4', author: '저자명', genres: ['소설', '베스트셀러'] },
-  { id: 5, title: '도서 제목 5', author: '저자명', genres: ['소설', '베스트셀러'] },
-  { id: 6, title: '도서 제목 6', author: '저자명', genres: ['소설', '베스트셀러'] },
-];
+import { getBooks } from '../bookService';
 
 function BookListPage({ onAddClick, onBookClick }) {
-  const totalCount = MOCK_BOOKS.length;
-  const [genreFilter, setGenreFilter] = useState('');
+  const [books, setBooks] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
   const [customGenreFilter, setCustomGenreFilter] = useState('');
   const [genreFilterOpen, setGenreFilterOpen] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await getBooks();
+        setBooks(data);
+      } catch (err) {
+        console.error('목록 불러오기 실패:', err);
+        setError('도서 목록을 불러오는 중 오류가 발생했습니다. 서버 연결을 확인하세요.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  // 직접 입력값이 있으면 그걸 우선 사용
+  const activeGenreFilter = customGenreFilter || selectedGenre;
+
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      (book.author && book.author.toLowerCase().includes(searchKeyword.toLowerCase()));
+
+    const matchesGenre =
+      activeGenreFilter === '' ||
+      (book.genres && book.genres.includes(activeGenreFilter));
+
+    return matchesSearch && matchesGenre;
+  });
+
+  if (isLoading) {
+    return (
+      <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
+        <Header onAddClick={onAddClick} />
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 20, gap: 2 }}>
+          <CircularProgress />
+          <Typography variant="body1" color="text.secondary">도서 목록을 불러오는 중입니다...</Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
+        <Header onAddClick={onAddClick} />
+        <Container maxWidth="lg" sx={{ py: 10, textAlign: 'center' }}>
+          <Box sx={{ py: 6, border: '1px dashed', borderColor: 'error.light', borderRadius: 1, bgcolor: 'error.50' }}>
+            <Typography variant="h6" color="error" sx={{ fontWeight: 700, mb: 1 }}>불러오기 실패</Typography>
+            <Typography variant="body2" color="error.main">{error}</Typography>
+          </Box>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
       <Header onAddClick={onAddClick} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* 검색 + 필터 영역 */}
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
-          sx={{
-            alignItems: { xs: 'stretch', sm: 'center' },
-            mb: 5,
-          }}
+          sx={{ alignItems: { xs: 'stretch', sm: 'center' }, mb: 5 }}
         >
           <TextField
             placeholder="제목 / 저자 검색..."
             size="small"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
             sx={{ flexGrow: 1, maxWidth: { sm: 480 } }}
             InputProps={{
               startAdornment: (
@@ -59,20 +111,18 @@ function BookListPage({ onAddClick, onBookClick }) {
               ),
             }}
           />
+
           <FormControl size="small" sx={{ minWidth: 140 }}>
             <Select
-              value={genreFilter}
+              value={selectedGenre}
               open={genreFilterOpen}
               onOpen={() => setGenreFilterOpen(true)}
               onClose={() => setGenreFilterOpen(false)}
               onChange={(e) => {
-                setGenreFilter(e.target.value);
+                setSelectedGenre(e.target.value);
                 setCustomGenreFilter('');
               }}
-              MenuProps={{
-                autoFocus: false,
-                disableAutoFocusItem: true,
-              }}
+              MenuProps={{ autoFocus: false, disableAutoFocusItem: true }}
               renderValue={(val) => {
                 if (customGenreFilter) return `직접 입력: ${customGenreFilter}`;
                 if (!val) return '전체 장르';
@@ -104,7 +154,10 @@ function BookListPage({ onAddClick, onBookClick }) {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       e.stopPropagation();
-                      setTimeout(() => setGenreFilterOpen(false), 0);
+                      setTimeout(() => {
+                        setSelectedGenre('');
+                        setGenreFilterOpen(false);
+                      }, 0);
                     }
                   }}
                   autoComplete="off"
@@ -114,6 +167,7 @@ function BookListPage({ onAddClick, onBookClick }) {
                   variant="outlined"
                   onClick={(e) => {
                     e.stopPropagation();
+                    setSelectedGenre('');
                     setGenreFilterOpen(false);
                   }}
                   sx={{ flexShrink: 0 }}
@@ -123,29 +177,20 @@ function BookListPage({ onAddClick, onBookClick }) {
               </Box>
             </Select>
           </FormControl>
+
           <Box sx={{ flexGrow: 1 }} />
           <Typography variant="body2" color="text.secondary">
-            총 {totalCount}권
+            총 {filteredBooks.length}권
           </Typography>
         </Stack>
 
-        {/* 카드 그리드 (도서 없을 때 Empty State 표시) */}
-        {MOCK_BOOKS.length === 0 ? (
-          <Box
-            sx={{
-              py: 8,
-              textAlign: 'center',
-              color: 'text.secondary',
-              border: '1px dashed',
-              borderColor: 'grey.300',
-              borderRadius: 1,
-            }}
-          >
-            <Typography variant="body1">등록된 도서가 없습니다.</Typography>
+        {filteredBooks.length === 0 ? (
+          <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: 'grey.300', borderRadius: 1 }}>
+            <Typography variant="body1">해당 조건의 도서가 없습니다.</Typography>
           </Box>
         ) : (
           <Grid container spacing={4} rowSpacing={5}>
-            {MOCK_BOOKS.map((book) => (
+            {filteredBooks.map((book) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={book.id}>
                 <BookCard book={book} onClick={() => onBookClick?.(book.id)} />
               </Grid>

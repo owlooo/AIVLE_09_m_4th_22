@@ -4,50 +4,50 @@ import BookListPage from './pages/BookListPage';
 import BookDetailPage from './pages/BookDetailPage';
 import BookFormPage from './pages/BookFormPage';
 
-// 라우터 연동 전까지 임시로 state 기반 페이지 전환 사용 (UI 영역만 담당)
 function App() {
   const [page, setPage] = useState('list'); // 'list' | 'detail' | 'form'
-  const [isEditing, setIsEditing] = useState(false);
+  const [selectedId, setSelectedId] = useState(null); // 어떤 책을 볼지/수정할지 ID 저장
 
-  const goList = () => setPage('list');
-  const goDetail = () => setPage('detail');
-  const goForm = () => {
-    setIsEditing(false);
-    setPage('form');
+  const goList = () => {
+    setPage('list');
+    setSelectedId(null);
   };
-  const goEdit = () => {
-    setIsEditing(true);
+
+  const goDetail = (id) => {
+    setSelectedId(id);
+    setPage('detail');
+  };
+
+  const goForm = (id = null) => {
+    setSelectedId(id); // id가 있으면 수정(id 전달), 없으면 등록(null)
     setPage('form');
   };
 
   return (
-    // index.css의 #root에 text-align:center / width:1126px 가 적용되어 있어
-    // 페이지 컴포넌트의 정렬이 깨집니다. 여기서 한번에 오버라이드.
-    <Box
-      sx={{
-        textAlign: 'left',
-        width: '100%',
-      }}
-    >
+    <Box sx={{ textAlign: 'left', width: '100%' }}>
       {page === 'list' && (
-        <BookListPage onAddClick={goForm} onBookClick={goDetail} />
+        <BookListPage onAddClick={() => goForm()} onBookClick={(id) => goDetail(id)} />
       )}
+
       {page === 'detail' && (
         <BookDetailPage
-          onAddClick={goForm}
+          bookId={selectedId} // 전달받은 ID를 상세 페이지로 넘김
+          onAddClick={() => goForm()}
           onBackClick={goList}
-          onEditClick={goEdit}
+          onEditClick={() => goForm(selectedId)} // 수정 시 기존 ID 전달
           onDeleteClick={goList}
         />
       )}
+
       {page === 'form' && (
         <BookFormPage
-          onAddClick={goForm}
+          bookId={selectedId} // 수정일 경우 ID가 넘어가고, 등록일 경우 null
+          onAddClick={() => goForm()}
           onBackClick={goList}
-          onCancel={goList}
-          onSubmit={goDetail}
-          onSubmitWithAi={goDetail}
-          isEditing={isEditing}
+          onCancel={selectedId ? () => goDetail(selectedId) : goList}
+          onSubmit={goList}
+          onSubmitWithAi={(id) => goDetail(id ?? selectedId)}
+          isEditing={!!selectedId}
         />
       )}
     </Box>

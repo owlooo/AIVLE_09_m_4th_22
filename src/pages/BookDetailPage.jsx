@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Container,
   Box,
@@ -17,117 +17,80 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import Header from '../components/Header';
 import AiCoverPanel from '../components/AiCoverPanel';
+import { getBookById, deleteBook } from '../bookService';
 
-// Mock 데이터 (UI 미리보기용)
-const MOCK_BOOK = {
-  id: 1,
-  title: '도서 제목',
-  author: '저자명',
-  publisher: '출판사',
-  publishDate: '2024.05.20',
-  genres: ['소설', '베스트셀러'],
-  description:
-    '책 소개 내용이 여기에 들어갑니다. 이 책은 어떤 이야기를 담고 있고, 누가 읽으면 좋을지에 대한 소개가 자리합니다. 여러 줄로 표시될 수 있으며, 책의 분위기와 핵심 메시지를 전달합니다.',
-  coverImageUrl: '',
-};
-
-function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick }) {
-  const book = MOCK_BOOK;
+function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick }) {
+  const [book, setBook] = useState(null);
   const [showAiPanel, setShowAiPanel] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getBookById(bookId);
+        setBook(data);
+      } catch (error) {
+        alert('도서 정보를 불러오는데 실패했습니다.');
+        onBackClick();
+      }
+    };
+    if (bookId) fetchData();
+  }, [bookId, onBackClick]);
+
+  const handleDelete = async () => {
+    if (window.confirm('정말로 삭제하시겠습니까?')) {
+      try {
+        await deleteBook(bookId);
+        onDeleteClick();
+      } catch (error) {
+        alert('삭제에 실패했습니다.');
+      }
+    }
+  };
+
+  if (!book) return <Box sx={{ p: 4 }}>로딩 중...</Box>;
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
       <Header onAddClick={onAddClick} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* 목록으로 돌아가기 */}
         <Link
           component="button"
           underline="hover"
           onClick={onBackClick}
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.5,
-            mb: 3,
-            color: 'primary.main',
-            fontSize: '0.9rem',
-          }}
+          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, mb: 3, color: 'primary.main' }}
         >
           <ArrowBackIcon fontSize="small" />
           목록으로
         </Link>
 
         <Grid container spacing={4}>
-          {/* 왼쪽: 표지 이미지 */}
           <Grid size={{ xs: 12, sm: 5, md: 4 }}>
-            <Stack spacing={2} sx={{ maxWidth: 360 }}>
-              <Box
-                sx={{
-                  width: '100%',
-                  aspectRatio: '3 / 4',
-                  bgcolor: 'grey.100',
-                  border: '1px dashed',
-                  borderColor: 'grey.300',
-                  borderRadius: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'grey.500',
-                }}
-              >
-                {book.coverImageUrl ? (
-                  <Box
-                    component="img"
-                    src={book.coverImageUrl}
-                    alt={book.title}
-                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <Stack spacing={1} sx={{ alignItems: 'center' }}>
-                    <ImageIcon fontSize="large" />
-                    <Typography variant="body2">표지 이미지</Typography>
-                  </Stack>
-                )}
-              </Box>
-
-            </Stack>
+            <Box sx={{ width: '100%', maxWidth: 360, aspectRatio: '3 / 4', bgcolor: 'grey.100', border: '1px dashed', borderColor: 'grey.300', borderRadius: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'grey.500' }}>
+              {book.coverImageUrl ? (
+                <Box component="img" src={book.coverImageUrl} alt={book.title} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <Stack spacing={1} sx={{ alignItems: 'center' }}>
+                  <ImageIcon fontSize="large" />
+                  <Typography variant="body2">표지 이미지</Typography>
+                </Stack>
+              )}
+            </Box>
           </Grid>
 
-          {/* 오른쪽: 상세 정보 */}
           <Grid size={{ xs: 12, sm: 7, md: 8 }}>
-            <Typography
-              variant="h4"
-              gutterBottom
-              sx={{ fontWeight: 700, wordBreak: 'break-word' }}
-            >
-              {book.title}
-            </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ wordBreak: 'break-word' }}
-            >
-              {book.author} · {book.publisher} · {book.publishDate}
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>{book.title}</Typography>
+            <Typography variant="body1" color="text.secondary">
+              {book.author}
             </Typography>
 
-            <Stack
-              direction="row"
-              spacing={1}
-              useFlexGap
-              sx={{ mt: 2, flexWrap: 'wrap' }}
-            >
-              {book.genres.map((genre) => (
-                <Chip
-                  key={genre}
-                  label={genre}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              ))}
-            </Stack>
+            {book.genres && (
+              <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
+                {book.genres.map((genre) => (
+                  <Chip key={genre} label={genre} size="small" color="primary" variant="outlined" />
+                ))}
+              </Stack>
+            )}
 
             <Stack
               direction="row"
@@ -135,40 +98,17 @@ function BookDetailPage({ onAddClick, onBackClick, onEditClick, onDeleteClick })
               useFlexGap
               sx={{ mt: 3, flexWrap: 'wrap' }}
             >
-              <Button
-                variant="outlined"
-                startIcon={<EditIcon />}
-                onClick={onEditClick}
-              >
-                수정
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                startIcon={<DeleteIcon />}
-                onClick={onDeleteClick}
-              >
-                삭제
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => setShowAiPanel((v) => !v)}
-              >
-                AI 표지 수정
-              </Button>
+              <Button variant="outlined" startIcon={<EditIcon />} onClick={onEditClick}>수정</Button>
+              <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>삭제</Button>
+              <Button variant="contained" onClick={() => setShowAiPanel((v) => !v)}>AI 표지 수정</Button>
             </Stack>
 
             <Divider sx={{ my: 3 }} />
 
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
-              책 소개
-            </Typography>
-            <Typography
-              variant="body1"
-              color="text.primary"
-              sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}
-            >
-              {book.description}
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>책 소개</Typography>
+            <Typography variant="body1" color="text.primary" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
+              {/* description이 있으면 우선 표시하고, 없으면 content를 표시 */}
+              {book.description || book.content || "등록된 소개글이 없습니다."}
             </Typography>
           </Grid>
         </Grid>

@@ -1,0 +1,35 @@
+{
+  "books": [
+    {
+      "id": 1,
+      "title": "별빛 아래의 서점",
+      "author": "홍길동",
+      "content": "작은 마을 서점의 1년을 담은 에세이",
+      "coverImageUrl": "",
+      "createdAt": "2026-04-24T09:00:00.000Z",
+      "updatedAt": "2026-05-26T02:05:11.504Z",
+      "publisher": "",
+      "publishDate": "",
+      "genres": [],
+      "description": ""
+    },
+    {
+      "id": 2,
+      "title": "데이터 분석의 정석",
+      "author": "김데이터",
+      "content": "파이썬을 활용한 데이터 전처리와 시각화 기초 가이드.",
+      "coverImageUrl": "",
+      "createdAt": "2026-05-22T10:00:00.000Z",
+      "updatedAt": "2026-05-22T10:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "title": "서울의 도시 공간",
+      "author": "이서울",
+      "content": "서울 25개 자치구별 과밀화 현상과 분석 모델링 기록.",
+      "coverImageUrl": "",
+      "createdAt": "2026-05-22T14:30:00.000Z",
+      "updatedAt": "2026-05-22T14:30:00.000Z"
+    }
+  ]
+}
