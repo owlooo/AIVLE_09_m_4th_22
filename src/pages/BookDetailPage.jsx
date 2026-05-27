@@ -32,22 +32,35 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
         const data = await getBookById(bookId);
         setBook(data);
 
-        // 같은 장르의 다른 책을 최대 3개 추천
-        if (data?.genres?.length) {
-          try {
-            const allBooks = await getBooks();
-            const recs = allBooks
-              .filter(
-                (b) =>
-                  b.id !== data.id &&
-                  b.genres?.some((g) => data.genres.includes(g))
-              )
-              .slice(0, 3);
-            setRecommendedBooks(recs);
-          } catch {
-            setRecommendedBooks([]);
-          }
-        } else {
+        try {
+          const allBooks = await getBooks();
+          
+          const currentGenres = data.genres || [];
+          const currentTags = data.tags || [];
+
+          const recs = allBooks
+            .filter((b) => b.id !== data.id)
+            .map((b) => {
+              let score = 0;
+              const bookGenres = b.genres || [];
+              const bookTags = b.tags || [];
+
+              const hasMatchingGenre = bookGenres.some((g) => currentGenres.includes(g));
+              if (hasMatchingGenre) {
+                score += 5;
+              }
+
+              const matchingTagsCount = bookTags.filter((t) => currentTags.includes(t)).length;
+              score += matchingTagsCount * 2;
+
+              return { ...b, score };
+            })
+            .filter((b) => b.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 3);
+
+          setRecommendedBooks(recs);
+        } catch {
           setRecommendedBooks([]);
         }
       } catch (error) {
