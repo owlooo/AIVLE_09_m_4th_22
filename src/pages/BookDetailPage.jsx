@@ -121,8 +121,8 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
 
           <Grid size={{ xs: 12, sm: 7, md: 8 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>{book.title}</Typography>
-            <Typography variant="body1" color="text.secondary">
-              {book.author}
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+                {[book.author, book.publisher, book.publishDate].filter(Boolean).join(' · ')}
             </Typography>
 
             {book.genres && (
