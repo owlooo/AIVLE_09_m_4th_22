@@ -17,10 +17,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ImageIcon from '@mui/icons-material/Image';
 import Header from '../components/Header';
 import AiCoverPanel from '../components/AiCoverPanel';
-import { getBookById, deleteBook } from '../bookService';
+import BookCard from '../components/BookCard';
+import { getBookById, getBooks, deleteBook } from '../bookService';
 
-function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick }) {
+function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick, onBookClick }) {
   const [book, setBook] = useState(null);
+  const [recommendedBooks, setRecommendedBooks] = useState([]);
   const [showAiPanel, setShowAiPanel] = useState(false);
 
   useEffect(() => {
@@ -28,6 +30,25 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
       try {
         const data = await getBookById(bookId);
         setBook(data);
+
+        // 같은 장르의 다른 책을 최대 3개 추천
+        if (data?.genres?.length) {
+          try {
+            const allBooks = await getBooks();
+            const recs = allBooks
+              .filter(
+                (b) =>
+                  b.id !== data.id &&
+                  b.genres?.some((g) => data.genres.includes(g))
+              )
+              .slice(0, 3);
+            setRecommendedBooks(recs);
+          } catch {
+            setRecommendedBooks([]);
+          }
+        } else {
+          setRecommendedBooks([]);
+        }
       } catch (error) {
         alert('도서 정보를 불러오는데 실패했습니다.');
         onBackClick();
@@ -112,6 +133,23 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
             </Typography>
           </Grid>
         </Grid>
+
+        {/* 추천 도서 — 같은 장르의 다른 책 최대 3개 */}
+        {recommendedBooks.length > 0 && (
+          <Box sx={{ mt: 6 }}>
+            <Divider sx={{ mb: 3 }} />
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
+              이 책과 비슷한 책
+            </Typography>
+            <Grid container spacing={3}>
+              {recommendedBooks.map((rec) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={rec.id}>
+                  <BookCard book={rec} onClick={() => onBookClick?.(rec.id)} />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
       </Container>
 
       {/* AI 표지 생성 — 화면 가운데 팝업(Dialog) */}

@@ -36,6 +36,7 @@ function App() {
           onBackClick={goList}
           onEditClick={() => goForm(selectedId)} // 수정 시 기존 ID 전달
           onDeleteClick={goList}
+          onBookClick={(id) => goDetail(id)} // 추천 도서 클릭 시 해당 도서로 이동
         />
       )}
 
