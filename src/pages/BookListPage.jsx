@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Container,
   Box,
@@ -18,6 +18,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import { getBooks } from '../bookService';
+import { getBookPreferences } from '../preferenceService';
+import { getPersonalizedRecommendations } from '../recommendationService';
 
 function BookListPage({ onAddClick, onBookClick, onLogoClick }) {
   const [books, setBooks] = useState([]);
@@ -25,6 +27,7 @@ function BookListPage({ onAddClick, onBookClick, onLogoClick }) {
   const [selectedGenre, setSelectedGenre] = useState('');
   const [customGenreFilter, setCustomGenreFilter] = useState('');
   const [genreFilterOpen, setGenreFilterOpen] = useState(false);
+  const [preferences, setPreferences] = useState(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,8 +49,17 @@ function BookListPage({ onAddClick, onBookClick, onLogoClick }) {
     fetchBooks();
   }, []);
 
+  useEffect(() => {
+    setPreferences(getBookPreferences());
+  }, []);
+
   // 직접 입력값이 있으면 그걸 우선 사용
   const activeGenreFilter = customGenreFilter || selectedGenre;
+
+  const personalizedBooks = useMemo(
+    () => getPersonalizedRecommendations(books, preferences),
+    [books, preferences],
+  );
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
@@ -92,6 +104,29 @@ function BookListPage({ onAddClick, onBookClick, onLogoClick }) {
       <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
+        {personalizedBooks.length > 0 && (
+          <Box sx={{ mb: 5 }}>
+            <Stack spacing={0.75} sx={{ mb: 2.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                나를 위한 추천 도서
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                최근 본 도서의 태그와 장르를 바탕으로 골랐어요.
+              </Typography>
+            </Stack>
+
+            <Grid container spacing={4} rowSpacing={5}>
+              {personalizedBooks.map((book) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={book.id}>
+                  <BookCard book={book} onClick={() => onBookClick?.(book.id)} />
+                </Grid>
+              ))}
+            </Grid>
+
+            <Divider sx={{ mt: 5 }} />
+          </Box>
+        )}
+
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={2}

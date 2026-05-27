@@ -34,7 +34,7 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
 
         try {
           const allBooks = await getBooks();
-          
+
           const currentGenres = data.genres || [];
           const currentTags = data.tags || [];
 
@@ -107,7 +107,7 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
 
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, sm: 5, md: 4 }}>
-            <Box sx={{ width: '100%', maxWidth: 360, aspectRatio: '3 / 4', bgcolor: 'grey.100', border: '1px dashed', borderColor: 'grey.300', borderRadius: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'grey.500' }}>
+            <Box sx={{ width: '100%', maxWidth: 360, aspectRatio: '2 / 3', bgcolor: 'grey.100', border: '1px dashed', borderColor: 'grey.300', borderRadius: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'grey.500' }}>
               {book.coverImageUrl ? (
                 <Box component="img" src={book.coverImageUrl} alt={book.title} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -121,9 +121,22 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
 
           <Grid size={{ xs: 12, sm: 7, md: 8 }}>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>{book.title}</Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                {[book.author, book.publisher, book.publishDate].filter(Boolean).join(' · ')}
-            </Typography>
+            <Stack direction="row" spacing={2} useFlexGap sx={{ flexWrap: 'wrap', mb: 1.5 }}>
+              {[
+                ['저자', book.author],
+                ['출판사', book.publisher],
+                ['출간일', book.publishDate],
+              ].filter(([, value]) => value).map(([label, value]) => (
+                <Box key={label} sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                  <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 700 }}>
+                    {label}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {value}
+                  </Typography>
+                </Box>
+              ))}
+            </Stack>
 
             {book.genres && (
               <Stack direction="row" spacing={1} sx={{ mt: 2, flexWrap: 'wrap' }}>
@@ -162,7 +175,7 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
           </Grid>
         </Grid>
 
-        {/* 추천 도서 — 같은 장르의 다른 책 최대 3개 */}
+        {/* 추천 도서 — 장르와 태그가 비슷한 책 최대 3개 */}
         {recommendedBooks.length > 0 && (
           <Box sx={{ mt: 6 }}>
             <Divider sx={{ mb: 3 }} />

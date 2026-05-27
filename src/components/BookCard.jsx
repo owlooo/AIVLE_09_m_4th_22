@@ -18,7 +18,7 @@ function BookCard({ book, onClick }) {
         <Box
           sx={{
             width: '100%',
-            aspectRatio: '4 / 3',
+            aspectRatio: '2 / 3',
             bgcolor: 'grey.100',
             border: '1px dashed',
             borderColor: 'grey.300',
