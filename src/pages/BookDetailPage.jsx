@@ -19,6 +19,7 @@ import Header from '../components/Header';
 import AiCoverPanel from '../components/AiCoverPanel';
 import BookCard from '../components/BookCard';
 import { getBookById, getBooks, deleteBook } from '../bookService';
+import { saveBookPreference } from '../preferenceService';
 
 function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick, onBookClick, onLogoClick }) {
   const [book, setBook] = useState(null);
@@ -56,6 +57,12 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
     };
     if (bookId) fetchData();
   }, [bookId, onBackClick]);
+
+  useEffect(() => {
+    if (book) {
+      saveBookPreference(book);
+    }
+  }, [book]);
 
   const handleDelete = async () => {
     if (window.confirm('정말로 삭제하시겠습니까?')) {
