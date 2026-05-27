@@ -20,7 +20,7 @@ import AiCoverPanel from '../components/AiCoverPanel';
 import BookCard from '../components/BookCard';
 import { getBookById, getBooks, deleteBook } from '../bookService';
 
-function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick, onBookClick }) {
+function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDeleteClick, onBookClick, onLogoClick }) {
   const [book, setBook] = useState(null);
   const [recommendedBooks, setRecommendedBooks] = useState([]);
   const [showAiPanel, setShowAiPanel] = useState(false);
@@ -72,7 +72,7 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-      <Header onAddClick={onAddClick} />
+      <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Link

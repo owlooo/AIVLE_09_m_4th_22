@@ -19,7 +19,7 @@ import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import { getBooks } from '../bookService';
 
-function BookListPage({ onAddClick, onBookClick }) {
+function BookListPage({ onAddClick, onBookClick, onLogoClick }) {
   const [books, setBooks] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('');
@@ -64,7 +64,7 @@ function BookListPage({ onAddClick, onBookClick }) {
   if (isLoading) {
     return (
       <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-        <Header onAddClick={onAddClick} />
+        <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 20, gap: 2 }}>
           <CircularProgress />
           <Typography variant="body1" color="text.secondary">도서 목록을 불러오는 중입니다...</Typography>
@@ -76,7 +76,7 @@ function BookListPage({ onAddClick, onBookClick }) {
   if (error) {
     return (
       <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-        <Header onAddClick={onAddClick} />
+        <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
         <Container maxWidth="lg" sx={{ py: 10, textAlign: 'center' }}>
           <Box sx={{ py: 6, border: '1px dashed', borderColor: 'error.light', borderRadius: 1, bgcolor: 'error.50' }}>
             <Typography variant="h6" color="error" sx={{ fontWeight: 700, mb: 1 }}>불러오기 실패</Typography>
@@ -89,7 +89,7 @@ function BookListPage({ onAddClick, onBookClick }) {
 
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-      <Header onAddClick={onAddClick} />
+      <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Stack

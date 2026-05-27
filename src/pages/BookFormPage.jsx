@@ -12,11 +12,9 @@ import {
   Stack,
   Link,
   Divider,
-  Dialog,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Header from '../components/Header';
-import AiCoverPanel from '../components/AiCoverPanel';
 import { getBookById, createBook, updateBook } from '../bookService';
 
 function BookFormPage({
@@ -25,7 +23,7 @@ function BookFormPage({
   onBackClick,
   onCancel,
   onSubmit,
-  onSubmitWithAi,
+  onLogoClick,
 }) {
   const isEditing = !!bookId;
 
@@ -42,9 +40,6 @@ function BookFormPage({
   // 장르 드롭다운 (직접 입력 지원)
   const [genreOpen, setGenreOpen] = useState(false);
   const [customGenre, setCustomGenre] = useState('');
-
-  // AI 표지 생성 Dialog
-  const [showAiPanel, setShowAiPanel] = useState(false);
 
   useEffect(() => {
     if (bookId) {
@@ -120,31 +115,9 @@ function BookFormPage({
     }
   };
 
-  const openAiPanel = () => {
-    if (!validate()) return;
-    setShowAiPanel(true);
-  };
-
-  const handleSaveAndAi = async () => {
-    const dataToSave = { ...formData, content: formData.description };
-    try {
-      let result;
-      if (bookId) {
-        result = await updateBook(bookId, dataToSave);
-      } else {
-        result = await createBook(dataToSave);
-      }
-      setShowAiPanel(false);
-      // OpenAI 담당자: 여기서 AI 표지 생성 API 호출 + 책에 표지 URL 저장
-      onSubmitWithAi?.(result?.id);
-    } catch (error) {
-      alert('저장에 실패했습니다.');
-    }
-  };
-
   return (
     <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh' }}>
-      <Header onAddClick={onAddClick} />
+      <Header onAddClick={onAddClick} onLogoClick={onLogoClick} />
 
       <Container maxWidth="sm" sx={{ py: 4 }}>
         {/* 목록으로 돌아가기 */}
@@ -297,7 +270,7 @@ function BookFormPage({
           />
         </Stack>
 
-        {/* 하단 버튼: 수정 모드면 "저장", 신규 등록이면 "저장 후 AI 표지 생성" */}
+        {/* 하단 버튼 — 등록/수정 모두 "저장" */}
         <Stack
           direction="row"
           spacing={1.5}
@@ -307,31 +280,11 @@ function BookFormPage({
           <Button variant="outlined" onClick={onCancel}>
             취소
           </Button>
-          {isEditing ? (
-            <Button variant="contained" onClick={handleSave}>
-              저장
-            </Button>
-          ) : (
-            <Button variant="contained" onClick={openAiPanel}>
-              저장 후 AI 표지 생성
-            </Button>
-          )}
+          <Button variant="contained" onClick={handleSave}>
+            저장
+          </Button>
         </Stack>
       </Container>
-
-      {/* 저장 후 AI 표지 생성 — 화면 가운데 팝업(Dialog) */}
-      <Dialog
-        open={showAiPanel}
-        onClose={() => setShowAiPanel(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { p: 2, bgcolor: 'background.paper' } }}
-      >
-        <AiCoverPanel
-          onClose={() => setShowAiPanel(false)}
-          onGenerate={handleSaveAndAi}
-        />
-      </Dialog>
     </Box>
   );
 }

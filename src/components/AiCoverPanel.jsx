@@ -26,9 +26,6 @@ function AiCoverPanel({ onGenerate, onClose }) {
   const [colorTone, setColorTone] = useState('자동');
   const [customColorTone, setCustomColorTone] = useState('');
   const [colorToneOpen, setColorToneOpen] = useState(false);
-  const [ratio, setRatio] = useState('1024x1536');
-  const [customRatio, setCustomRatio] = useState('');
-  const [ratioOpen, setRatioOpen] = useState(false);
   const [quality, setQuality] = useState('medium');
   const [includeTitle, setIncludeTitle] = useState(false);
 
@@ -221,93 +218,20 @@ function AiCoverPanel({ onGenerate, onClose }) {
             </FormControl>
           </Stack>
 
-          {/* 이미지 비율 + 품질 (2-column) */}
-          <Stack direction="row" spacing={1}>
-            <FormControl size="small" fullWidth>
-              <InputLabel>이미지 비율</InputLabel>
-              <Select
-                label="이미지 비율"
-                value={ratio}
-                open={ratioOpen}
-                onOpen={() => setRatioOpen(true)}
-                onClose={() => setRatioOpen(false)}
-                onChange={(e) => {
-                  setRatio(e.target.value);
-                  setCustomRatio(''); // 프리셋 선택 시 직접 입력값 초기화
-                }}
-                MenuProps={{
-                  autoFocus: false,
-                  disableAutoFocusItem: true,
-                }}
-                renderValue={(val) => {
-                  if (customRatio) return `직접 입력: ${customRatio}`;
-                  if (val === '1024x1536') return '세로 (1024x1536)';
-                  if (val === '1024x1024') return '정사각형 (1024x1024)';
-                  if (val === '1536x1024') return '가로 (1536x1024)';
-                  return val;
-                }}
-              >
-                <MenuItem value="1024x1536">세로 (1024x1536)</MenuItem>
-                <MenuItem value="1024x1024">정사각형 (1024x1024)</MenuItem>
-                <MenuItem value="1536x1024">가로 (1536x1024)</MenuItem>
-                <Divider />
-                <Box
-                  sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => {
-                    // Select가 Enter/Space 등을 가로채지 못하게 차단
-                    e.stopPropagation();
-                  }}
-                  onKeyDownCapture={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  <TextField
-                    size="small"
-                    fullWidth
-                    placeholder="예: 1024x1536"
-                    value={customRatio}
-                    onChange={(e) => setCustomRatio(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // 다음 tick에서 닫기 -> MUI 내부 처리와 충돌 방지
-                        setTimeout(() => setRatioOpen(false), 0);
-                      }
-                    }}
-                    autoComplete="off"
-                  />
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setRatioOpen(false);
-                    }}
-                    sx={{ flexShrink: 0 }}
-                  >
-                    적용
-                  </Button>
-                </Box>
-              </Select>
-            </FormControl>
-
-            <FormControl size="small" fullWidth>
-              <InputLabel>품질</InputLabel>
-              <Select
-                label="품질"
-                value={quality}
-                onChange={(e) => setQuality(e.target.value)}
-              >
-                <MenuItem value="low">저품질</MenuItem>
-                <MenuItem value="medium">표준</MenuItem>
-                <MenuItem value="high">고품질</MenuItem>
-                <MenuItem value="auto">자동</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
+          {/* 품질 */}
+          <FormControl size="small" fullWidth>
+            <InputLabel>품질</InputLabel>
+            <Select
+              label="품질"
+              value={quality}
+              onChange={(e) => setQuality(e.target.value)}
+            >
+              <MenuItem value="low">저품질</MenuItem>
+              <MenuItem value="medium">표준</MenuItem>
+              <MenuItem value="high">고품질</MenuItem>
+              <MenuItem value="auto">자동</MenuItem>
+            </Select>
+          </FormControl>
 
           {/* 표지에 제목 텍스트 포함 토글 */}
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
