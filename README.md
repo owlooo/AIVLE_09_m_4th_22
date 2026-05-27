@@ -18,7 +18,7 @@ npx json-server@0.17.4 --watch db.json
 
 ---
 
-### ✨ 주요 기능 (Key Features)
+### ✨ 주요 기능
 
 - **AI 기반 도서 표지 생성**
   - 사용자가 입력한 도서 제목과 소개를 기반으로 OpenAI Image API를 활용하여 도서 표지를 자동 생성합니다.
@@ -50,7 +50,7 @@ npx json-server@0.17.4 --watch db.json
 
 ---
 
-## 📸 화면 스크린샷 (Screenshots)
+## 📸 화면 스크린샷
 
 ### 1. 메인 목록 화면
 <img width="800" alt="Image" src="https://github.com/user-attachments/assets/11a83a0d-6a66-47f6-8659-5f5c751c2577" />
