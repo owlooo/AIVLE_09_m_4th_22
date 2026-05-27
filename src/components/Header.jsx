@@ -1,8 +1,8 @@
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, ButtonBase } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 
-function Header({ onAddClick }) {
+function Header({ onAddClick, onLogoClick }) {
   return (
     <AppBar
       position="static"
@@ -10,12 +10,25 @@ function Header({ onAddClick }) {
       sx={{ bgcolor: 'background.paper', color: 'text.primary' }}
     >
       <Toolbar sx={{ minHeight: 64 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+        <ButtonBase
+          onClick={onLogoClick}
+          disableRipple
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            flexGrow: 1,
+            justifyContent: 'flex-start',
+            borderRadius: 1,
+            px: 0.5,
+            '&:hover': { opacity: 0.8 },
+          }}
+        >
           <MenuBookIcon color="primary" />
           <Typography variant="h6" component="div" sx={{ fontWeight: 700 }}>
             BookShelf
           </Typography>
-        </Box>
+        </ButtonBase>
         <Button
           variant="contained"
           startIcon={<AddIcon />}

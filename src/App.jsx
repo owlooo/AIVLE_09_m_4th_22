@@ -26,7 +26,11 @@ function App() {
   return (
     <Box sx={{ textAlign: 'left', width: '100%' }}>
       {page === 'list' && (
-        <BookListPage onAddClick={() => goForm()} onBookClick={(id) => goDetail(id)} />
+        <BookListPage
+          onAddClick={() => goForm()}
+          onBookClick={(id) => goDetail(id)}
+          onLogoClick={goList}
+        />
       )}
 
       {page === 'detail' && (
@@ -36,6 +40,8 @@ function App() {
           onBackClick={goList}
           onEditClick={() => goForm(selectedId)} // 수정 시 기존 ID 전달
           onDeleteClick={goList}
+          onBookClick={(id) => goDetail(id)} // 추천 도서 클릭 시 해당 도서로 이동
+          onLogoClick={goList}
         />
       )}
 
@@ -46,8 +52,7 @@ function App() {
           onBackClick={goList}
           onCancel={selectedId ? () => goDetail(selectedId) : goList}
           onSubmit={goList}
-          onSubmitWithAi={(id) => goDetail(id ?? selectedId)}
-          isEditing={!!selectedId}
+          onLogoClick={goList}
         />
       )}
     </Box>
