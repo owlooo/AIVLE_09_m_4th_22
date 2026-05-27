@@ -113,6 +113,14 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
               </Stack>
             )}
 
+            {book.tags?.length > 0 && (
+              <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: 'wrap' }}>
+                {book.tags.map((tag) => (
+                  <Chip key={tag} label={`#${tag}`} size="small" variant="outlined" />
+                ))}
+              </Stack>
+            )}
+
             <Stack
               direction="row"
               spacing={1}
@@ -160,7 +168,14 @@ function BookDetailPage({ bookId, onAddClick, onBackClick, onEditClick, onDelete
         fullWidth
         PaperProps={{ sx: { p: 2, bgcolor: 'background.paper' } }}
       >
-        <AiCoverPanel onClose={() => setShowAiPanel(false)} />
+        <AiCoverPanel
+          book={book}
+          onClose={() => setShowAiPanel(false)}
+          onCoverGenerated={(updatedBook) => {
+            setBook((prev) => ({ ...prev, ...updatedBook }));
+            setShowAiPanel(false);
+          }}
+        />
       </Dialog>
     </Box>
   );

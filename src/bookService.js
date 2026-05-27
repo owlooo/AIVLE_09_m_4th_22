@@ -77,3 +77,25 @@ export const deleteBook = async (id) => {
     throw error;
   }
 };
+
+// 6. AI 표지 이미지 및 태그 저장
+export const updateBookCover = async (id, coverImageUrl, tags) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        coverImageUrl,
+        tags,
+      }),
+    });
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      throw new Error(`표지 이미지 저장 실패 (${response.status})${errorText ? `: ${errorText}` : ''}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
