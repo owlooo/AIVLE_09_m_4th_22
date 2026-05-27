@@ -52,14 +52,14 @@ npx json-server@0.17.4 --watch db.json
 
 ## 📸 화면 스크린샷 (Screenshots)
 
-| 메인 목록 화면 |
-<img width="842" height="662" alt="Image" src="https://github.com/user-attachments/assets/11a83a0d-6a66-47f6-8659-5f5c751c2577" />
-<img width="841" height="586" alt="Image" src="https://github.com/user-attachments/assets/f1b6603e-b9d2-46ed-b05b-1b1cd070b33c" />
+### 1. 메인 목록 화면
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/11a83a0d-6a66-47f6-8659-5f5c751c2577" />
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/f1b6603e-b9d2-46ed-b05b-1b1cd070b33c" />
 
-| 도서 상세 및 추천 화면 |
-<img width="844" height="563" alt="Image" src="https://github.com/user-attachments/assets/9e623c30-adbe-4e4e-bbb1-0ba9bbb4a84a" />
-<img width="845" height="583" alt="Image" src="https://github.com/user-attachments/assets/67cba749-0a4e-40e6-8aea-96926418de15" />
+### 2. 도서 상세 및 추천 화면
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/9e623c30-adbe-4e4e-bbb1-0ba9bbb4a84a" />
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/67cba749-0a4e-40e6-8aea-96926418de15" />
 
-| 수정 화면 및 삭제 화면 |
-<img width="844" height="695" alt="Image" src="https://github.com/user-attachments/assets/89872293-60d1-4661-8afb-eeee19150f6d" />
-<img width="845" height="538" alt="Image" src="https://github.com/user-attachments/assets/ff01f3a6-cf9d-4279-84af-11f0b2c18906" />
+### 3. 수정 및 삭제 화면
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/89872293-60d1-4661-8afb-eeee19150f6d" />
+<img width="800" alt="Image" src="https://github.com/user-attachments/assets/ff01f3a6-cf9d-4279-84af-11f0b2c18906" />
