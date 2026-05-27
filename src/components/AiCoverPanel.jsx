@@ -22,6 +22,7 @@ import {
   buildCoverPrompt,
   generateCoverImage,
 } from '../coverService';
+import { generateBookTags } from '../tagService';
 
 function AiCoverPanel({ book, onCoverGenerated, onClose }) {
   const [apiKey, setApiKey] = useState('');
@@ -62,14 +63,20 @@ function AiCoverPanel({ book, onCoverGenerated, onClose }) {
     try {
       setIsGenerating(true);
       setError('');
-      const imageSrc = await generateCoverImage({
-        apiKey,
-        prompt,
-        size: selectedRatio,
-        quality,
-      });
-      const updatedBook = await updateBookCover(book.id, imageSrc);
-      onCoverGenerated?.(updatedBook.coverImageUrl || imageSrc);
+      const [imageSrc, tags] = await Promise.all([
+        generateCoverImage({
+          apiKey,
+          prompt,
+          size: selectedRatio,
+          quality,
+        }),
+        generateBookTags({
+          apiKey,
+          book,
+        }),
+      ]);
+      const updatedBook = await updateBookCover(book.id, imageSrc, tags);
+      onCoverGenerated?.(updatedBook);
     } catch (err) {
       setError(err.message || '표지 생성에 실패했습니다.');
     } finally {
@@ -364,7 +371,7 @@ function AiCoverPanel({ book, onCoverGenerated, onClose }) {
             {isGenerating ? (
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                 <CircularProgress color="inherit" size={18} />
-                <span>표지 생성 중...</span>
+                <span>표지·태그 생성 중...</span>
               </Stack>
             ) : (
               '이 도서 내용으로 표지 생성'
@@ -372,7 +379,7 @@ function AiCoverPanel({ book, onCoverGenerated, onClose }) {
           </Button>
 
           <Typography variant="caption" color="text.secondary">
-            ※ 이미지 생성 시 OpenAI API 사용량에 따라 비용이 발생할 수 있습니다.
+            ※ 이미지와 태그 생성 시 OpenAI API 사용량에 따라 비용이 발생할 수 있습니다.
           </Typography>
         </Stack>
       </Paper>
