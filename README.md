@@ -7,20 +7,14 @@
 본 프로젝트는 프론트엔드와 json-server를 동시에 실행해야 합니다.
 
 ### 1. 패키지 설치
-\`\`\`bash
 npm install
-\`\`\`
 
 ### 2. 프론트엔드 앱 실행
-\`\`\`bash
 npm run dev
-\`\`\`
 
 ### 3. JSON Server 실행
 별도의 터미널을 열고 아래 명령어를 실행합니다.
-\`\`\`bash
 npx json-server@0.17.4 --watch db.json
-\`\`\`
 
 ---
 
